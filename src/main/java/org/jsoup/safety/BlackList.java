@@ -1,11 +1,18 @@
 package org.jsoup.safety;
 
-/**
- * Created by IntelliJ IDEA.
- * User: yeameen
- * Date: Nov 13, 2010
- * Time: 12:45:36 PM
- * To change this template use File | Settings | File Templates.
- */
-public class BlackList {
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+
+public class BlackList implements Iterable {
+
+    private List<SelectiveCleanerRule> rules;
+
+    public BlackList() {
+        rules = new LinkedList<SelectiveCleanerRule>();
+    }
+
+    public Iterator iterator() {
+        return rules.iterator();
+    }
 }

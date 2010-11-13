@@ -5,7 +5,7 @@
 
   <groupId>org.jsoup</groupId>
   <artifactId>jsoup</artifactId>
-  <version>1.3.4-SNAPSHOT</version>
+  <version>1.3.5-SNAPSHOT</version>
   <description>jsoup HTML parser</description>
   <url>http://jsoup.org/</url>
   <inceptionYear>2009</inceptionYear>
@@ -125,7 +125,7 @@
       <!-- junit -->
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>4.5</version>
+      <version>4.8</version>
       <scope>test</scope>
     </dependency>
 
@@ -149,6 +149,16 @@
         <role>Lead Developer</role>
       </roles>
       <timezone>+11</timezone>
+    </developer>
+
+    <developer>
+        <id>yeameen</id>
+        <name>Chowdhury Ashabul Yeameen</name>
+        <email>ayeameen@yahoo.com</email>
+        <roles>
+            <role>Contributing Developer</role>
+        </roles>
+        <timezone>+6</timezone>
     </developer>
   </developers>
 

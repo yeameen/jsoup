@@ -2,9 +2,6 @@ package org.jsoup.safety;
 
 public class AttributeMatchingRule {
 
-    /** Possible matching conditions */
-    public enum AttributeMatchingCondition { HAS, MATCHES, STARTS_WITH, CONTAINS, ENDS_WITH }; // may include regex
-
     private AttributeMatchingCondition condition;
     private String name;
     private String value;
