@@ -4,7 +4,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-public class BlackList implements Iterable {
+public class BlackList implements Iterable<SelectiveCleanerRule> {
 
     private List<SelectiveCleanerRule> rules;
 
@@ -12,7 +12,7 @@ public class BlackList implements Iterable {
         rules = new LinkedList<SelectiveCleanerRule>();
     }
 
-    public Iterator iterator() {
+    public Iterator<SelectiveCleanerRule> iterator() {
         return rules.iterator();
     }
 }

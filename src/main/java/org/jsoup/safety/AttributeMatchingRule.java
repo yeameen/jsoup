@@ -46,4 +46,15 @@ public class AttributeMatchingRule {
         return new AttributeMatchingRule(name, value, AttributeMatchingCondition.ENDS_WITH);
     }
 
+    public AttributeMatchingCondition getCondition() {
+        return condition;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getValue() {
+        return value;
+    }
 }

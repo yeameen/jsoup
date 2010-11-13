@@ -49,4 +49,20 @@ public class SelectiveCleanerRule {
                                                                AttributeMatchingRule rule, boolean retainTag) {
         return new SelectiveCleanerRule(tagName, rule, retainTag);
     }
+
+    public String getTagName() {
+        return tagName;
+    }
+
+    public AttributeMatchingRule getAttributeMatchingRule() {
+        return attributeMatchingRule;
+    }
+
+    public SelectiveMatchingCondition getCondition() {
+        return condition;
+    }
+
+    public boolean isRetainTag() {
+        return retainTag;
+    }
 }
