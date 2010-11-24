@@ -15,4 +15,8 @@ public class BlackList implements Iterable<SelectiveCleanerRule> {
     public Iterator<SelectiveCleanerRule> iterator() {
         return rules.iterator();
     }
+
+    public void addRule(SelectiveCleanerRule rule) {
+        rules.add(rule);
+    }
 }

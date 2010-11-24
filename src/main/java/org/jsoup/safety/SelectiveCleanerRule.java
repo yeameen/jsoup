@@ -37,15 +37,15 @@ public class SelectiveCleanerRule {
         this.condition = SelectiveMatchingCondition.BY_ATTRIBUTE_RULE;
     }
 
-    public SelectiveCleanerRule matchByTagName(String tagName, boolean retainTag) {
+    public static SelectiveCleanerRule matchByTagName(String tagName, boolean retainTag) {
         return new SelectiveCleanerRule(tagName, retainTag);
     }
 
-    public SelectiveCleanerRule matchByAttributeRule(AttributeMatchingRule attributeMatchingRule, boolean retainTag) {
+    public static SelectiveCleanerRule matchByAttributeRule(AttributeMatchingRule attributeMatchingRule, boolean retainTag) {
         return new SelectiveCleanerRule(attributeMatchingRule, retainTag);
     }
 
-    public SelectiveCleanerRule matchByTagNameAndAttributeRule(String tagName,
+    public static SelectiveCleanerRule matchByTagNameAndAttributeRule(String tagName,
                                                                AttributeMatchingRule rule, boolean retainTag) {
         return new SelectiveCleanerRule(tagName, rule, retainTag);
     }

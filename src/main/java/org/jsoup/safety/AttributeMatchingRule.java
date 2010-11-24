@@ -26,23 +26,23 @@ public class AttributeMatchingRule {
 
 
 
-    public AttributeMatchingRule hasAttribute(String name) {
+    public static AttributeMatchingRule hasAttribute(String name) {
         return new AttributeMatchingRule(name, null, AttributeMatchingCondition.HAS);
     }
 
-    public AttributeMatchingRule attributeValueMatches(String name, String value) {
+    public static AttributeMatchingRule attributeValueMatches(String name, String value) {
         return new AttributeMatchingRule(name, value);
     }
 
-    public AttributeMatchingRule attributeValueStartsWith(String name, String value) {
+    public static AttributeMatchingRule attributeValueStartsWith(String name, String value) {
         return new AttributeMatchingRule(name, value, AttributeMatchingCondition.STARTS_WITH);
     }
 
-    public AttributeMatchingRule attributeValueContains(String name, String value) {
+    public static AttributeMatchingRule attributeValueContains(String name, String value) {
         return new AttributeMatchingRule(name, value, AttributeMatchingCondition.CONTAINS);
     }
 
-    public AttributeMatchingRule attributeValueEndsWith(String name, String value) {
+    public static AttributeMatchingRule attributeValueEndsWith(String name, String value) {
         return new AttributeMatchingRule(name, value, AttributeMatchingCondition.ENDS_WITH);
     }
 
