@@ -1,3 +1,10 @@
+This is a fork of wonderful html beautifier jsoup. The extra feature I have added is to remove a dom element
+with keeping all its children intact.
+
+Don't forget to see parent source at https://github.com/jhy/jsoup
+
+Description from original project:
+
 jsoup: Java HTML parser that makes sense of real-world HTML soup.
 
 jsoup is a Java library for working with real-world HTML. It provides a very convenient API
