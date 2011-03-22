@@ -179,7 +179,7 @@ public class Element extends Node {
     }
 
     /**
-     * Find elements that match the selector query, with this element as the starting context. Matched elements
+     * Find elements that match the {@link Selector} query, with this element as the starting context. Matched elements
      * may include this element, or any of its children.
      * <p/>
      * This method is generally more powerful to use than the DOM-type {@code getElementBy*} methods, because
@@ -967,7 +967,7 @@ public class Element extends Node {
     }
 
     void outerHtmlHead(StringBuilder accum, int depth, Document.OutputSettings out) {
-        if (out.prettyPrint() && (isBlock() || (parent() != null && parent().tag().canContainBlock() && siblingIndex() == 0)))
+        if (out.prettyPrint() && (tag.formatAsBlock() || (parent() != null && parent().tag().formatAsBlock())))
             indent(accum, depth, out);
         accum
                 .append("<")
@@ -982,7 +982,7 @@ public class Element extends Node {
 
     void outerHtmlTail(StringBuilder accum, int depth, Document.OutputSettings out) {
         if (!(childNodes.isEmpty() && tag.isSelfClosing())) {
-            if (out.prettyPrint() && !childNodes.isEmpty() && tag.canContainBlock())
+            if (out.prettyPrint() && !childNodes.isEmpty() && tag.formatAsBlock())
                 indent(accum, depth, out);
             accum.append("</").append(tagName()).append(">");
         }
@@ -1040,5 +1040,12 @@ public class Element extends Node {
         int result = super.hashCode();
         result = 31 * result + (tag != null ? tag.hashCode() : 0);
         return result;
+    }
+
+    @Override
+    public Element clone() {
+        Element clone = (Element) super.clone();
+        clone.classNames(); // creates linked set of class names from class attribute
+        return clone;
     }
 }

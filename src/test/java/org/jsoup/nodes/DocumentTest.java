@@ -1,6 +1,7 @@
 package org.jsoup.nodes;
 
 import org.jsoup.Jsoup;
+import org.jsoup.TextUtil;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -51,6 +52,31 @@ public class DocumentTest {
         Document doc = Jsoup.parse("&lt; &gt; &amp; &quot; &apos; &times;");
         doc.outputSettings().escapeMode(Entities.EscapeMode.xhtml);
         assertEquals("&lt; &gt; &amp; &quot; &apos; ×", doc.body().html());
+    }
+
+    @Test public void testNormalisesStructure() {
+        Document doc = Jsoup.parse("<html><head><script>one</script><noscript><p>two</p></noscript></head><body><p>three</p></body></html>");
+        assertEquals("<html><head><script>one</script><noscript></noscript></head><body><p>two</p><p>three</p></body></html>", TextUtil.stripNewlines(doc.html()));
+    }
+
+    @Test public void testClone() {
+        Document doc = Jsoup.parse("<title>Hello</title> <p>One<p>Two");
+        Document clone = doc.clone();
+
+        assertEquals("<html><head><title>Hello</title> </head><body><p>One</p><p>Two</p></body></html>", TextUtil.stripNewlines(clone.html()));
+        clone.title("Hello there");
+        clone.select("p").first().text("One more").attr("id", "1");
+        assertEquals("<html><head><title>Hello there</title> </head><body><p id=\"1\">One more</p><p>Two</p></body></html>", TextUtil.stripNewlines(clone.html()));
+        assertEquals("<html><head><title>Hello</title> </head><body><p>One</p><p>Two</p></body></html>", TextUtil.stripNewlines(doc.html()));
+    }
+
+    @Test public void testClonesDeclarations() {
+        Document doc = Jsoup.parse("<!DOCTYPE html><html><head><title>Doctype test");
+        Document clone = doc.clone();
+
+        assertEquals(doc.html(), clone.html());
+        assertEquals("<!DOCTYPE html><html><head><title>Doctype test</title></head><body></body></html>",
+                TextUtil.stripNewlines(clone.html()));
     }
 
 }

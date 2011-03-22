@@ -209,7 +209,7 @@ public class ParserTest {
     @Test public void handlesWhatWgExpensesTableExample() {
         // http://www.whatwg.org/specs/web-apps/current-work/multipage/tabular-data.html#examples-0
         Document doc = Jsoup.parse("<table> <colgroup> <col> <colgroup> <col> <col> <col> <thead> <tr> <th> <th>2008 <th>2007 <th>2006 <tbody> <tr> <th scope=rowgroup> Research and development <td> $ 1,109 <td> $ 782 <td> $ 712 <tr> <th scope=row> Percentage of net sales <td> 3.4% <td> 3.3% <td> 3.7% <tbody> <tr> <th scope=rowgroup> Selling, general, and administrative <td> $ 3,761 <td> $ 2,963 <td> $ 2,433 <tr> <th scope=row> Percentage of net sales <td> 11.6% <td> 12.3% <td> 12.6% </table>");
-        assertEquals("<table> <colgroup> <col /> </colgroup><colgroup> <col /> <col /> <col /> </colgroup><thead> <tr> <th> </th><th>2008 </th><th>2007 </th><th>2006 </th></tr></thead><tbody> <tr> <th scope=\"rowgroup\">Research and development </th><td>$ 1,109 </td><td>$ 782 </td><td>$ 712 </td></tr><tr> <th scope=\"row\">Percentage of net sales </th><td>3.4% </td><td>3.3% </td><td>3.7% </td></tr></tbody><tbody> <tr> <th scope=\"rowgroup\">Selling, general, and administrative </th><td>$ 3,761 </td><td>$ 2,963 </td><td>$ 2,433 </td></tr><tr> <th scope=\"row\">Percentage of net sales </th><td>11.6% </td><td>12.3% </td><td>12.6% </td></tr></tbody></table>", TextUtil.stripNewlines(doc.body().html()));
+        assertEquals("<table> <colgroup> <col /> </colgroup><colgroup> <col /> <col /> <col /> </colgroup><thead> <tr> <th> </th><th>2008 </th><th>2007 </th><th>2006 </th></tr></thead><tbody> <tr> <th scope=\"rowgroup\"> Research and development </th><td> $ 1,109 </td><td> $ 782 </td><td> $ 712 </td></tr><tr> <th scope=\"row\"> Percentage of net sales </th><td> 3.4% </td><td> 3.3% </td><td> 3.7% </td></tr></tbody><tbody> <tr> <th scope=\"rowgroup\"> Selling, general, and administrative </th><td> $ 3,761 </td><td> $ 2,963 </td><td> $ 2,433 </td></tr><tr> <th scope=\"row\"> Percentage of net sales </th><td> 11.6% </td><td> 12.3% </td><td> 12.6% </td></tr></tbody></table>", TextUtil.stripNewlines(doc.body().html()));
     }
     
     @Test public void handlesTbodyTable() {
@@ -378,5 +378,24 @@ public class ParserTest {
     @Test public void testRelaxedTags() {
         Document doc = Jsoup.parse("<abc_def id=1>Hello</abc_def> <abc-def>There</abc-def>");
         assertEquals("<abc_def id=\"1\">Hello</abc_def> <abc-def>There</abc-def>", TextUtil.stripNewlines(doc.body().html()));
+    }
+
+    @Test public void testHeaderContents() {
+        // h* tags (h1 .. h9) in browsers can handle any internal content other than other h*. which is not per any
+        // spec, which defines them as containing phrasing content only. so, reality over theory.
+        Document doc = Jsoup.parse("<h1>Hello <div>There</div> now</h1> <h2>More <h3>Content</h3></h2>");
+        assertEquals("<h1>Hello <div>There</div> now</h1> <h2>More </h2><h3>Content</h3>", TextUtil.stripNewlines(doc.body().html()));
+    }
+
+    @Test public void testSpanContents() {
+        // like h1 tags, the spec says SPAN is phrasing only, but browsers and publisher treat span as a block tag
+        Document doc = Jsoup.parse("<span>Hello <div>there</div> <span>now</span></span>");
+        assertEquals("<span>Hello <div>there</div> <span>now</span></span>", TextUtil.stripNewlines(doc.body().html()));
+    }
+
+    @Test public void testAllowsImageInNoScriptInHead() {
+        // some sites use this pattern as an analytics mechanism
+        Document doc = Jsoup.parse("<html><head><noscript><img src='foo'></noscript></head><body><p>Hello</p></body></html>");
+        assertEquals("<html><head><noscript><img src=\"foo\" /></noscript></head><body><p>Hello</p></body></html>", TextUtil.stripNewlines(doc.html()));
     }
 }

@@ -112,19 +112,19 @@ public class ElementsTest {
         els.val("three");
         assertEquals("three", els.first().val());
         assertEquals("three", els.last().val());
-        assertEquals("<textarea>three</textarea>", els.last().outerHtml());
+        assertEquals("\n<textarea>three</textarea>", els.last().outerHtml());
     }
     
     @Test public void before() {
         Document doc = Jsoup.parse("<p>This <a>is</a> <a>jsoup</a>.</p>");
         doc.select("a").before("<span>foo</span>");
-        assertEquals("<p>This <span>foo</span><a>is</a> <span>foo</span><a>jsoup</a>.</p>", doc.body().html());
+        assertEquals("<p>This <span>foo</span><a>is</a> <span>foo</span><a>jsoup</a>.</p>", TextUtil.stripNewlines(doc.body().html()));
     }
     
     @Test public void after() {
         Document doc = Jsoup.parse("<p>This <a>is</a> <a>jsoup</a>.</p>");
         doc.select("a").after("<span>foo</span>");
-        assertEquals("<p>This <a>is</a><span>foo</span> <a>jsoup</a><span>foo</span>.</p>", doc.body().html());
+        assertEquals("<p>This <a>is</a><span>foo</span> <a>jsoup</a><span>foo</span>.</p>", TextUtil.stripNewlines(doc.body().html()));
     }
 
     @Test public void wrap() {
@@ -173,5 +173,17 @@ public class ElementsTest {
         assertEquals("div", parents.get(0).tagName());
         assertEquals("body", parents.get(1).tagName());
         assertEquals("html", parents.get(2).tagName());
+    }
+
+    @Test public void not() {
+        Document doc = Jsoup.parse("<div id=1><p>One</p></div> <div id=2><p><span>Two</span></p></div>");
+
+        Elements div1 = doc.select("div").not(":has(p > span)");
+        assertEquals(1, div1.size());
+        assertEquals("1", div1.first().id());
+
+        Elements div2 = doc.select("div").not("#1");
+        assertEquals(1, div2.size());
+        assertEquals("2", div2.first().id());
     }
 }

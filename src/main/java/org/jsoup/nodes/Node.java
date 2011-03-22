@@ -15,7 +15,7 @@ import java.util.List;
  The base, abstract Node model. Elements, Documents, Comments etc are all Node instances.
 
  @author Jonathan Hedley, jonathan@hedley.net */
-public abstract class Node {
+public abstract class Node implements Cloneable {
     Node parentNode;
     List<Node> childNodes;
     Attributes attributes;
@@ -135,14 +135,17 @@ public abstract class Node {
 
     /**
      * Get an absolute URL from a URL attribute that may be relative (i.e. an <code>&lt;a href></code> or
-     * <code>&lt;img src></code>.
+     * <code>&lt;img src></code>).
+     * <p/>
+     * E.g.: <code>String absUrl = linkEl.absUrl("href");</code>
      * <p/>
      * If the attribute value is already absolute (i.e. it starts with a protocol, like
      * <code>http://</code> or <code>https://</code> etc), and it successfully parses as a URL, the attribute is
      * returned directly. Otherwise, it is treated as a URL relative to the element's {@link #baseUri}, and made
      * absolute using that.
      * <p/>
-     * As an alternate, you can use the {@link #attr} method with the <code>abs:</code> prefix.
+     * As an alternate, you can use the {@link #attr} method with the <code>abs:</code> prefix, e.g.:
+     * <code>String absUrl = linkEl.attr("abs:href");</code>
      *
      * @param attributeKey The attribute key
      * @return An absolute URL if one could be made, or an empty string (not null) if the attribute was missing or
@@ -166,6 +169,9 @@ public abstract class Node {
                     URL abs = new URL(relUrl);
                     return abs.toExternalForm();
                 }
+                // workaround: java resolves '//path/file + ?foo' to '//path/?foo', not '//path/file?foo' as desired
+                if (relUrl.startsWith("?"))
+                    relUrl = base.getPath() + relUrl;
                 URL abs = new URL(base, relUrl);
                 return abs.toExternalForm();
             } catch (MalformedURLException e) {
@@ -357,7 +363,12 @@ public abstract class Node {
     }
 
     protected void outerHtml(StringBuilder accum) {
-        new NodeTraversor(new OuterHtmlVisitor(accum, ownerDocument().outputSettings())).traverse(this);
+        new NodeTraversor(new OuterHtmlVisitor(accum, getOutputSettings())).traverse(this);
+    }
+
+    // if this node has no document (or parent), retrieve the default output settings
+    private Document.OutputSettings getOutputSettings() {
+        return ownerDocument() != null ? ownerDocument().outputSettings() : (new Document("")).outputSettings();
     }
 
     /**
@@ -389,6 +400,38 @@ public abstract class Node {
         // not children, or will block stack as they go back up to parent)
         result = 31 * result + (attributes != null ? attributes.hashCode() : 0);
         return result;
+    }
+
+    /**
+     * Create a stand-alone, deep copy of this node, and all of its children. The cloned node will have no siblings or
+     * parent node. As a stand-alone object, any changes made to the clone or any of its children will not impact the
+     * original node.
+     * <p>
+     * The cloned node may be adopted into another Document or node structure using {@link Element#appendChild(Node)}.
+     * @return stand-alone cloned node
+     */
+    @Override
+    public Node clone() {
+        return doClone(null); // splits for orphan
+    }
+
+    protected Node doClone(Node parent) {
+        Node clone;
+        try {
+            clone = (Node) super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new RuntimeException(e);
+        }
+
+        clone.parentNode = parent; // can be null, to create an orphan split
+        clone.siblingIndex = parent == null ? 0 : siblingIndex;
+        clone.attributes = attributes != null ? attributes.clone() : null;
+        clone.baseUri = baseUri;
+        clone.childNodes = new ArrayList<Node>(childNodes.size());
+        for (Node child: childNodes)
+            clone.childNodes.add(child.doClone(clone)); // clone() creates orphans, doClone() keeps parent
+
+        return clone;
     }
 
     private static class OuterHtmlVisitor implements NodeVisitor {

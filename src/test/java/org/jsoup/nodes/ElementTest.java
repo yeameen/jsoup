@@ -203,8 +203,8 @@ public class ElementTest {
     }
 
     @Test public void testFormatHtml() {
-        Document doc = Jsoup.parse("<div><p>Hello</p></div>");
-        assertEquals("<html>\n <head></head>\n <body>\n  <div>\n   <p>Hello</p>\n  </div>\n </body>\n</html>", doc.html());
+        Document doc = Jsoup.parse("<title>Format test</title><div><p>Hello <span>jsoup <span>users</span></span></p><p>Good.</p></div>");
+        assertEquals("<html>\n <head>\n  <title>Format test</title>\n </head>\n <body>\n  <div>\n   <p>Hello <span>jsoup <span>users</span></span></p>\n   <p>Good.</p>\n  </div>\n </body>\n</html>", doc.html());
     }
 
     @Test public void testSetIndent() {
@@ -411,6 +411,35 @@ public class ElementTest {
         Element p = doc.select("p").first();
         assertEquals(0, p.dataset().size());
 
+    }
+
+    @Test public void parentlessToString() {
+        Document doc = Jsoup.parse("<img src='foo'>");
+        Element img = doc.select("img").first();
+        assertEquals("\n<img src=\"foo\" />", img.toString());
+
+        img.remove(); // lost its parent
+        assertEquals("<img src=\"foo\" />", img.toString());
+    }
+
+    @Test public void testClone() {
+        Document doc = Jsoup.parse("<div><p>One<p><span>Two</div>");
+
+        Element p = doc.select("p").get(1);
+        Element clone = p.clone();
+
+        assertNull(clone.parent()); // should be orphaned
+        assertEquals(0, clone.siblingIndex);
+        assertEquals(1, p.siblingIndex);
+        assertNotNull(p.parent());
+
+        clone.append("<span>Three");
+        assertEquals("<p><span>Two</span><span>Three</span></p>", TextUtil.stripNewlines(clone.outerHtml()));
+        assertEquals("<div><p>One</p><p><span>Two</span></p></div>", TextUtil.stripNewlines(doc.body().html())); // not modified
+
+        doc.body().appendChild(clone); // adopt
+        assertNotNull(clone.parent());
+        assertEquals("<div><p>One</p><p><span>Two</span></p></div><p><span>Two</span><span>Three</span></p>", TextUtil.stripNewlines(doc.body().html()));
     }
 
 

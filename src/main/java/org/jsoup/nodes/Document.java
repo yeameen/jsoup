@@ -2,6 +2,7 @@ package org.jsoup.nodes;
 
 import org.jsoup.helper.Validate;
 import org.jsoup.parser.Tag;
+import org.jsoup.select.Elements;
 
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
@@ -106,15 +107,18 @@ public class Document extends Element {
 
         // pull text nodes out of root, html, and head els, and push into body. non-text nodes are already taken care
         // of. do in inverse order to maintain text order.
-        normalise(head());
-        normalise(htmlEl);
-        normalise(this);        
+        normaliseTextNodes(head());
+        normaliseTextNodes(htmlEl);
+        normaliseTextNodes(this);
 
+        normaliseStructure("head", htmlEl);
+        normaliseStructure("body", htmlEl);
+        
         return this;
     }
 
     // does not recurse.
-    private void normalise(Element element) {
+    private void normaliseTextNodes(Element element) {
         List<Node> toMove = new ArrayList<Node>();
         for (Node node: element.childNodes) {
             if (node instanceof TextNode) {
@@ -129,6 +133,28 @@ public class Document extends Element {
             element.removeChild(node);
             body().prependChild(new TextNode(" ", ""));
             body().prependChild(node);
+        }
+    }
+
+    // merge multiple <head> or <body> contents into one, delete the remainder, and ensure they are owned by <html>
+    private void normaliseStructure(String tag, Element htmlEl) {
+        Elements elements = this.getElementsByTag(tag);
+        Element master = elements.first(); // will always be available as created above if not existent
+        if (elements.size() > 1) { // dupes, move contents to master
+            List<Node> toMove = new ArrayList<Node>();
+            for (int i = 1; i < elements.size(); i++) {
+                Node dupe = elements.get(i);
+                for (Node node : dupe.childNodes)
+                    toMove.add(node);
+                dupe.remove();
+            }
+
+            for (Node dupe : toMove)
+                master.appendChild(dupe);
+        }
+        // ensure parented by <html>
+        if (!master.parent().equals(htmlEl)) {
+            htmlEl.appendChild(master); // includes remove()            
         }
     }
 
@@ -167,10 +193,17 @@ public class Document extends Element {
         return "#document";
     }
 
+    @Override
+    public Document clone() {
+        Document clone = (Document) super.clone();
+        clone.outputSettings = this.outputSettings.clone();
+        return clone;
+    }
+
     /**
      * A Document's output settings control the form of the text() and html() methods.
      */
-    public class OutputSettings {
+    public class OutputSettings implements Cloneable {
         private Entities.EscapeMode escapeMode = Entities.EscapeMode.base;
         private Charset charset = Charset.forName("UTF-8");
         private CharsetEncoder charsetEncoder = charset.newEncoder();
@@ -275,6 +308,20 @@ public class Document extends Element {
             Validate.isTrue(indentAmount >= 0);
             this.indentAmount = indentAmount;
             return this;
+        }
+
+        @Override
+        public OutputSettings clone() {
+            OutputSettings clone;
+            try {
+                clone = (OutputSettings) super.clone();
+            } catch (CloneNotSupportedException e) {
+                throw new RuntimeException(e);
+            }
+            clone.charset(charset.name()); // new charset and charset encoder
+            clone.escapeMode = Entities.EscapeMode.valueOf(escapeMode.name());
+            // indentAmount, prettyPrint are primitives so object.clone() will handle
+            return clone;
         }
     }
 
