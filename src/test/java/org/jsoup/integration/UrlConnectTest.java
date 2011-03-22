@@ -95,4 +95,51 @@ public class UrlConnectTest {
         assertTrue(doc.title().contains("Google"));
     }
 
+    @Test
+    public void followsRelativeRedirect() throws IOException {
+        Connection con = Jsoup.connect("http://infohound.net/tools/302-rel.pl"); // to ./ - /tools/
+        Document doc = con.post();
+        assertTrue(doc.title().contains("HTML Tidy Online"));
+    }
+
+    @Test
+    public void throwsExceptionOnError() {
+        Connection con = Jsoup.connect("http://infohound.net/tools/404");
+        boolean threw = false;
+        try {
+            Document doc = con.get();
+        } catch (IOException e) {
+            threw = true;
+        }
+        assertTrue(threw);
+    }
+
+    @Test
+    public void doesntRedirectIfSoConfigured() throws IOException {
+        Connection con = Jsoup.connect("http://infohound.net/tools/302.pl").followRedirects(false);
+        Connection.Response res = con.execute();
+        assert(res.statusCode() == 302);
+    }
+
+    @Test
+    public void redirectsResponseCookieToNextResponse() throws IOException {
+        Connection con = Jsoup.connect("http://infohound.net/tools/302-cookie.pl");
+        Connection.Response res = con.execute();
+        assertEquals("asdfg123", res.cookie("token")); // confirms that cookies set on 1st hit are presented in final result
+        Document doc = res.parse();
+        assertEquals("token=asdfg123", ihVal("HTTP_COOKIE", doc)); // confirms that redirected hit saw cookie
+    }
+
+    @Test
+    public void maximumRedirects() {
+        boolean threw = false;
+        try {
+            Document doc = Jsoup.connect("http://infohound.net/tools/loop.pl").get();
+        } catch (IOException e) {
+            assertTrue(e.getMessage().contains("Too many redirects"));
+            threw = true;
+        }
+        assertTrue(threw);
+    }
+
 }

@@ -112,7 +112,7 @@ public class ElementsTest {
         els.val("three");
         assertEquals("three", els.first().val());
         assertEquals("three", els.last().val());
-        assertEquals("\n<textarea>three</textarea>", els.last().outerHtml());
+        assertEquals("<textarea>three</textarea>", els.last().outerHtml());
     }
     
     @Test public void before() {
@@ -185,5 +185,12 @@ public class ElementsTest {
         Elements div2 = doc.select("div").not("#1");
         assertEquals(1, div2.size());
         assertEquals("2", div2.first().id());
+    }
+
+    @Test public void tagNameSet() {
+        Document doc = Jsoup.parse("<p>Hello <i>there</i> <i>now</i></p>");
+        doc.select("i").tagName("em");
+
+        assertEquals("<p>Hello <em>there</em> <em>now</em></p>", doc.body().html());
     }
 }

@@ -249,7 +249,7 @@ public class Tag {
         // TODO[must]: incorporate html 5 as appropriate
 
         // document
-        createBlock("HTML").setAncestor(new String[0]); // specific includes not impl
+        createBlock("HTML").setAncestor(); // specific includes not impl
         createBlock("HEAD").setParent("HTML").setLimitChildren();
         createBlock("BODY").setAncestor("HTML"); // specific includes not impl
         createBlock("FRAMESET").setAncestor("HTML");
@@ -277,10 +277,11 @@ public class Tag {
         createBlock("FOOTER").setExcludes("HEADER", "FOOTER");
 
         // fontstyle
-        createInline("FONT");
+        createInline("FONT").setOptionalClosing().setCanContainBlock().setFormatAsInline();
         createInline("TT");
         createInline("I");
         createInline("B");
+        createInline("U");
         createInline("BIG");
         createInline("SMALL");
 
@@ -304,7 +305,7 @@ public class Tag {
         createInline("RP").setParent("RUBY").setExcludes("RT", "RP");
 
         // special
-        createInline("A").setOptionalClosing(); // cannot contain self
+        createInline("A").setOptionalClosing().setCanContainBlock().setFormatAsInline(); // cannot contain self
         createInline("IMG").setEmpty().setAncestor("BODY", "NOSCRIPT"); // noscript so an image can be in html->head->noscript
         createInline("BR").setEmpty();
         createInline("WBR").setEmpty();
