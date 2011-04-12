@@ -1,3 +1,6 @@
+/**
+ * @author Chowdhury Ashabul Yeameen
+ */
 package org.jsoup.safety;
 
 /**

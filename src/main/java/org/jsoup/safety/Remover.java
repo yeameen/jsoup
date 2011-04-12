@@ -1,3 +1,6 @@
+/**
+ * @author: Chowdhury Ashabul Yeameen
+ */
 package org.jsoup.safety;
 
 import org.jsoup.helper.Validate;
@@ -7,17 +10,29 @@ import org.jsoup.parser.Tag;
 import java.util.List;
 
 /**
- * This class selectively removes tags based on the rules provided
+ * The blacklist based HTML tag remover. This class selectively removes tags based on the rules provided.
+ *
+ *
  */
 public class Remover {
 
     private BlackList blackList;
 
+    /**
+     * Creates a new remover, that sanitized the document from the rules supplied
+     * @param blackList The black-list of rules to remove
+     */
     public Remover(BlackList blackList) {
         Validate.notNull(blackList);
         this.blackList = blackList;
     }
-    
+
+    /**
+     * Clean the document off remover rule and return the cleaned document
+     *
+     * @param inputDocument The dirty document
+     * @return  The cleaned Document
+     */
     public Document clean(Document inputDocument) {
         Validate.notNull(inputDocument);
         Document cleanedDocument = Document.createShell(inputDocument.baseUri());
@@ -25,6 +40,12 @@ public class Remover {
         return cleanedDocument;
     }
 
+    /**
+     * Check if the element mathches with the rule
+     * @param el
+     * @param rule
+     * @return
+     */
     private boolean matchesAttributeCondition(Element el, AttributeMatchingRule rule) {
 
         String name = rule.getName();
@@ -45,10 +66,26 @@ public class Remover {
         return false;
     }
 
+    /**
+     * Checks if the tagname of the element matches with the tagname given in the rule
+     * The first consideration of matching the rule is to match the tagname. Then comes
+     * others.
+     *
+     * @param el the element under consideration
+     * @param rule The rule from black-list
+     * @return true if the element's tagname matches with the tagname of the rule
+     */
     private boolean matchesTagName(Element el, SelectiveCleanerRule rule) {
         return el.tagName().equals(rule.getTagName());
     }
 
+    /**
+     * Checks if the rule matches with the element under consideration
+     *
+     * @param el the element under consideration
+     * @param rule The rule from black-list
+     * @return true if the element matches with the rule
+     */
     private boolean matchesRule(Element el, SelectiveCleanerRule rule) {
 
         SelectiveMatchingCondition condition = rule.getCondition();
@@ -63,6 +100,13 @@ public class Remover {
         return false;
     }
 
+    /**
+     * Copy only the elements that don't match with the rules
+     *
+     * @param dest The destination element or the tree
+     * @param src The source element or the tree
+     * @return number of elements copied
+     */
     private int copyCleanElements(Element dest, Element src) {
          List<Node> childNodes = src.childNodes();
 

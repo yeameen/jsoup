@@ -1,5 +1,8 @@
-This is a fork of wonderful html beautifier jsoup. The extra feature I have added is to remove a dom element
-with keeping all its children intact.
+This is a fork of wonderful html beautifier jsoup. The original jsoup works nicely to clean
+the document based on the list of tags to retain. Yet sometimes I need just the opposite; list
+the tags (or tag-attribute rule) which I want to make blacklisted and need removal. Seconly, sometimes
+I need only to remove the tag but keeping all its children (now make them children of their grandparent ;-) ).
+The extra feature I have added is to remove a dom element but keeping all its children intact.
 
 Don't forget to see parent source at https://github.com/jhy/jsoup
 
