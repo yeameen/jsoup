@@ -26,14 +26,14 @@ public class SelectiveCleanerRule {
         this.condition = SelectiveMatchingCondition.BY_TAGNAME;
     }
 
-    public SelectiveCleanerRule(String tagName, AttributeMatchingRule attributeMatchingRule, boolean retainTag) {
+    private SelectiveCleanerRule(String tagName, AttributeMatchingRule attributeMatchingRule, boolean retainTag) {
         this.tagName = tagName;
         this.attributeMatchingRule = attributeMatchingRule;
         this.retainTag = retainTag;
         this.condition = SelectiveMatchingCondition.BY_TAGNAME_AND_ATTRIBUTE_RULE;
     }
 
-    public SelectiveCleanerRule(AttributeMatchingRule attributeMatchingRule, boolean retainTag) {
+    private SelectiveCleanerRule(AttributeMatchingRule attributeMatchingRule, boolean retainTag) {
         this.tagName = null;
         this.attributeMatchingRule = attributeMatchingRule;
         this.retainTag = retainTag;
@@ -44,6 +44,12 @@ public class SelectiveCleanerRule {
         return new SelectiveCleanerRule(tagName, retainTag);
     }
 
+    /**
+     * TODO: not yet called
+     * @param attributeMatchingRule
+     * @param retainTag
+     * @return
+     */
     public static SelectiveCleanerRule matchByAttributeRule(AttributeMatchingRule attributeMatchingRule, boolean retainTag) {
         return new SelectiveCleanerRule(attributeMatchingRule, retainTag);
     }

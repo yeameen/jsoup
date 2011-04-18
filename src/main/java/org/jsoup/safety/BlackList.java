@@ -12,7 +12,7 @@ import java.util.List;
  */
 public class BlackList implements Iterable<SelectiveCleanerRule> {
 
-    private List<SelectiveCleanerRule> rules;
+    private final List<SelectiveCleanerRule> rules;
 
     /**
      *
